@@ -1,13 +1,16 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const config = require('./config.json');
+const config = require('./src/assets/configFiles/config.json');
 const prefix = config.PREFIX;
 client.on('message', async message => {
+if (message.member.bot) return;
 var args = message.content.slice(prefix.length).split(/ +/g);
 var command = args.shift().toLowerCase();
-if (command == "say") {
-if (!args[0]) return message.channel.send("Ingresa algún mensaje a ser enviado. `!say <mensaje>`")
-message.channel.send(args.join(" "));
+try {
+const commandFile = require("./src/commands/" + command);
+commandFile.run(client, message, args);
+} catch (e) {
+if (e) return console.log(e)
 };
 });
 client.login(config.TOKEN);
